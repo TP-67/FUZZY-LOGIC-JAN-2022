@@ -1,10 +1,8 @@
 """
 The alcohol consumption of an individual is measured on a scale of 0 to 100.
 The consumption is linguistically classified as less or more.
-
 The health index of a person in measured on a scale of 0 to 50.
 The health index is linguistically classified as good or poor.
-
 Given the measure of consumption of alcohol determine the health index of the person.
 """
 
@@ -24,7 +22,7 @@ def sigmoid(x, a, b):
     B:
         Positions the center of S - curve at value B.
     """
-    return x, 1 / (1 + np.exp(-a * (x - b)))
+    return 1 / (1 + np.exp(-a * (x - b)))
 
 
 def dec(x, a, b):
@@ -63,22 +61,23 @@ for i in range(len(health)):
     health_poor[i] = sigmoid(health[i], -0.7, 25)[1]
 
 
-# Antecedents
-input_alc = 45
+# Inputs/ Antecedents
+input_alc = 65
 input_alc_less = dec(input_alc, 30, 70)
 input_alc_more = inc(input_alc, 40, 80)
 
-
-# Rules
-"""
-Less -> Good
-More -> Poor
-"""
+# Rules Evaluation
+# (1) Less -> Good
 r1 = np.fmin(input_alc_less, health_good)
+# (2) More -> Poor
 r2 = np.fmin(input_alc_more, health_poor)
 
+# Rules Aggregation/ Summarization (Union or Intersection)
+r = np.maximum(r1, r2)
 
 # Defuzzification
+cent = np.trapz(r * health, health) / np.trapz(r, health)
+print('Anticipated health index:', cent)
 
 
 # Plot
@@ -92,7 +91,13 @@ plt.figure(1)
 plt.plot(health, health_good, label='GOOD')
 plt.plot(health, health_poor, label='POOR')
 plt.fill_between(health, r1, label="R1")
-plt.plot(health, r2, label="R2")
+plt.fill_between(health, r2, label="R2")
+plt.scatter(cent, 0)
+plt.legend()
+
+plt.figure(2)
+plt.fill_between(health, r, label="R1 U R2")
+plt.scatter(cent, 0)
 plt.legend()
 
 plt.show()
