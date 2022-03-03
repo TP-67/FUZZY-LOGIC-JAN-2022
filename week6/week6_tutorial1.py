@@ -95,7 +95,7 @@ r3 = np.fmin(np.min([input_sport_less, input_media_heavy]), iq_poor)
 # Rule Aggregation/ Summarization
 r = np.maximum(np.maximum(r1, r2), r3)
 
-# Defuzzification
+# Mamdani Defuzzification (Centroid)
 cent = np.trapz(r * iq, iq) / np.trapz(r, iq)
 print("Anticipated health index : ", cent)
 

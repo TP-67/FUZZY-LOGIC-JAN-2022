@@ -75,9 +75,28 @@ r2 = np.fmin(input_alc_more, health_poor)
 # Rules Aggregation/ Summarization (Union or Intersection)
 r = np.maximum(r1, r2)
 
-# Defuzzification
+# Mamdani Defuzzification (Centroid)
 cent = np.trapz(r * health, health) / np.trapz(r, health)
-print('Anticipated health index:', cent)
+print('Anticipated health index (Mamdani):', cent)
+
+# Tsukamoto Defuzzification (Weighted average)
+# output = (r1 * x1 + r2 * x2 + ... + xn * rn) / (r1 + r2 + ... + rn)
+
+# The output membership functions should be strictly monotonously increasing / decreasing.
+# Not allowed Gaussian function or trapizoid function.
+# This is because when we compute inverted function, we will get at least two different x-axis points, which in invalid when performing Tsukamoto defuzzification.
+
+# Sigmoid function: y = \frac{1}{1 + e^{-a(x - b)}}
+# Inverted sigmoid function: x = b + \frac{1}{a}ln[\frac{y}{1-y}]
+
+# For S or R function, we only need to compute inverted function of the middle part.
+r1_max = np.max(r1)
+r2_max = np.max(r2)
+
+x1 = 25 + 1/0.4 * np.log(r1_max / (1 - r1_max))
+x2 = 25 + 1/(-0.6) * np.log(r2_max / (1 - r2_max))
+x = (x1 * r1 + x2 * r2) / (r1 + r2)
+print('Anticipated health index (Tsukamoto):', x)
 
 
 # Plot
@@ -98,6 +117,7 @@ plt.legend()
 plt.figure(2)
 plt.fill_between(health, r, label="R1 U R2")
 plt.scatter(cent, 0)
+plt.scatter([x1, x2, x], [r1, r2, 0])
 plt.legend()
 
 plt.show()
