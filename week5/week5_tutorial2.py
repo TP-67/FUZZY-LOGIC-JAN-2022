@@ -1,11 +1,3 @@
-"""
-The alcohol consumption of an individual is measured on a scale of 0 to 100.
-The consumption is linguistically classified as less or more.
-The health index of a person in measured on a scale of 0 to 50.
-The health index is linguistically classified as good or poor.
-Given the measure of consumption of alcohol determine the health index of the person.
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -57,8 +49,8 @@ for i in range(len(alc)):
     alc_more[i] = inc(alc[i], 40, 80)
 
 for i in range(len(health)):
-    health_good[i] = sigmoid(health[i], 0.3, 25)[1]
-    health_poor[i] = sigmoid(health[i], -0.7, 25)[1]
+    health_good[i] = sigmoid(health[i], 0.3, 25)
+    health_poor[i] = sigmoid(health[i], -0.7, 25)
 
 
 # Inputs/ Antecedents
@@ -92,10 +84,9 @@ print('Anticipated health index (Mamdani):', cent)
 # For S or R function, we only need to compute inverted function of the middle part.
 r1_max = np.max(r1)
 r2_max = np.max(r2)
-
 x1 = 25 + 1/0.4 * np.log(r1_max / (1 - r1_max))
 x2 = 25 + 1/(-0.6) * np.log(r2_max / (1 - r2_max))
-x = (x1 * r1 + x2 * r2) / (r1 + r2)
+x = (x1 * r1_max + x2 * r2_max) / (r1_max + r2_max)
 print('Anticipated health index (Tsukamoto):', x)
 
 
@@ -117,7 +108,7 @@ plt.legend()
 plt.figure(2)
 plt.fill_between(health, r, label="R1 U R2")
 plt.scatter(cent, 0)
-plt.scatter([x1, x2, x], [r1, r2, 0])
+# plt.scatter([x1, x2, x], [r1, r2, 0])
 plt.legend()
 
 plt.show()
