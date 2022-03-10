@@ -1,0 +1,2 @@
+Anticipated raining index (Mamdani): 36.77323133657641
+Anticipated raining index (Tsukamoto):46.281209225652624
