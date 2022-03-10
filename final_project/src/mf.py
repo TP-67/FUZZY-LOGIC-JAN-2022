@@ -264,7 +264,7 @@ class GeneralizedBellMF(MembershipFunction):
         c: center of the function.
     """
     def __init__(self, a: float, b: float, c: float):
-        assert a < b < c, "Wrong order"
+        # assert a < b < c, "Wrong order"
 
         self.a: float = a
         self.b: float = b

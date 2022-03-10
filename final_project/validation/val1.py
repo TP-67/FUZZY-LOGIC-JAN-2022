@@ -108,7 +108,6 @@ plt.legend()
 plt.figure(2)
 plt.fill_between(health, r, label="R1 U R2")
 plt.scatter(cent, 0)
-# plt.scatter([x1, x2, x], [r1, r2, 0])
 plt.legend()
 
 plt.show()
