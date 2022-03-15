@@ -47,7 +47,7 @@ class Tsukamoto(Defuzzifier):
 
     Note:
         (1) The output membership functions should be strictly monotonously increasing / decreasing.
-        (2)This is because when we compute inverted function, we will get at least two different x-axis points, which in invalid when performing Tsukamoto defuzzification.
+        (2) Otherwise, when we compute inverted function, we will get at least two different x-axis points, which is invalid when performing Tsukamoto defuzzification.
 
     """
     def __init__(self, inv_fun: List[InverseMembershipFunction]):
@@ -65,5 +65,20 @@ class Tsukamoto(Defuzzifier):
             numerator += inv_fuzzy_max[i] * fuzzy_max[i]
             denominator += fuzzy_max[i]
         cent = numerator / denominator
+
+        return cent
+
+
+class Sugeno(Defuzzifier):
+    """
+    Compute weighted sum of output values and conditions among all rules.
+
+    Note: if we use Sugeno defuzzification method, there can not be more than two assertions in conditions.
+    """
+    def __init__(self):
+        pass
+
+    def get_value(self, conditions: List, fuzzy_result: List) -> float:
+        cent = sum([conditions[i] * fuzzy_result[i] for i in range(len(conditions))]) / sum(conditions)
 
         return cent

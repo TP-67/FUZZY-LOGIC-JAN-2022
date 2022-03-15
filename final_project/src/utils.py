@@ -95,7 +95,7 @@ def plot_fuzzy_result_with_center(x_min: int,
                                   x_max: int,
                                   res: int,
                                   y: List,
-                                  cent: float,
+                                  cent: Dict[str, float],
                                   config: Dict):
     x = np.linspace(x_min, x_max, res)
 
@@ -104,7 +104,11 @@ def plot_fuzzy_result_with_center(x_min: int,
     plt.style.context('ggplot')
     plt.plot(x, y)
     plt.fill_between(x, y, alpha=0.3, label='rule')
-    plt.scatter(cent, 0)
+    coordinates = []
+    for name, coordinate in cent.items():
+        plt.scatter(coordinate, 0, label=(name + ' Centroid'))
+        coordinates.append(coordinate)
+    plt.xticks(np.array(coordinates))
     plt.xlabel('x')
     plt.ylabel('fuzzy value')
     plt.title('Aggregation Rule with Centroid')

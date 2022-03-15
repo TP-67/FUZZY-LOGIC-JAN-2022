@@ -32,7 +32,8 @@ if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 config['output_path'] = output_dir
 
-# Define membership function
+# Define membership functions for both input and output fuzzy variables.
+# If we use Sugeno method, we need to define membership functions separately.
 # Wind speed
 w1 = Domain('slow', ZMF(5.0, 25.0))
 w2 = Domain('fast', SMF(10.0, 36.0))
@@ -55,14 +56,21 @@ m2 = Domain('hill', SigmoidMF(45, 0.7))
 r1 = Domain('hardly', SigmoidMF(25, -0.7))
 r2 = Domain('certain', SigmoidMF(25, 0.3))
 
-# Convert to fuzzy variables
+# Define fuzzy variables for both input and output fuzzy variables.
+# If we use Sugeno method, we need to define output fuzzy variable separately.
 wind: FuzzyVariable = FuzzyVariable('wind', 0, 1, w1, w2)
 temperature: FuzzyVariable = FuzzyVariable('temperature', 0, 1, t1, t2, t3)
 humidity: FuzzyVariable = FuzzyVariable('humidity', 0, 1, h1, h2, h3)
 mountain: FuzzyVariable = FuzzyVariable('mountain', 0, 1, m1, m2)
 raining: FuzzyVariable = FuzzyVariable('raining', 0, 1, r1, r2)
 
-# Define constant value
+# Define membership functions for Sugeno method.
+# Pass
+
+# Define a output fuzzy variable for Sugeno method.
+# Pass
+
+# Define boundary values
 wind_x_min = 0
 wind_x_max = 50
 wind_x_resolution = (wind_x_max - wind_x_min) * 5
@@ -79,6 +87,7 @@ raining_x_min = 0
 raining_x_max = 50
 raining_x_resolution = (raining_x_max - raining_x_min) * 5
 
+# Check for validation
 if not check_valid([wind_x_min, wind_x_max],
                    [temperature_x_min, temperature_x_max],
                    [humidity_x_min, humidity_x_max],
@@ -87,6 +96,7 @@ if not check_valid([wind_x_min, wind_x_max],
     raise Exception('Invalid Input Values')
 
 # Define rules
+# Note: if we use Sugeno defuzzification method, there can not be more than two assertions in conditions.
 rule = Rule()
 conditions1, conclusion1 = rule.parse_rule('if (wind is fast) and (temperature is low) then (raining is hardly)')
 conditions2, conclusion2 = rule.parse_rule('if (wind is slow) and (humidity is wet) then (raining is certain)')
@@ -107,9 +117,15 @@ fuzzy_system.rules.append([conditions5, conclusion5])
 fuzzy_system.rules.append([conditions6, conclusion6])
 
 # Fuzzy inference
+# For Mamdani and Tsukamoto methods, we call 'calculate' function.
+# For Sugeno method, we call 'calculate_sugeno' function.
 fuzzy_matrix, conditions, conclusions, fuzzy_result = fuzzy_system.calculate(OrderedDict({wind: 25.0, temperature: 28.0, humidity: 33.0, mountain: 32.0}))
 
 # Defuzzification
+# Note:
+#   (1) If we set a SugenoFuzzyVariable as our output variable, then we can only defuzzify with Sugeno defuzzification.
+#   (2) If we set a FuzzyVariable as our output variable, then we can always use Mamdani defuzzification.
+#   (3) If we set a FuzzyVariable as our output variable, and the membership functions of the output variable is strictly increasing or decreasing, then we can use both Mamdani and Tsukamoto defuzzification.
 defuzzifier_m = Mamdani(raining_x_min, raining_x_max)
 d_m = defuzzifier_m.get_value(fuzzy_result)
 s_m = "Anticipated raining index (Mamdani): " + str(d_m)
@@ -135,13 +151,16 @@ plot_mf(humidity, 33.0, humidity_x_min, humidity_x_max, humidity_x_resolution, c
 plot_mf(mountain, 32.0, mountain_x_min, mountain_x_max, mountain_x_resolution, config)
 
 # Plot individual fuzzy rules
+# We only call this function for Mamdani and Tsukamoto defuzzification.
 plot_conclusions(raining, raining_x_min, raining_x_max, raining_x_resolution, conclusions, config)
 
-# Plot the fuzzy result rule
+# Plot the aggregated fuzzy result rule
+# We only call this function for Mamdani and Tsukamoto defuzzification.
 plot_fuzzy_result(raining_x_min, raining_x_max, raining_x_resolution, fuzzy_result, config)
 
-# Plot the fuzzy result rule with defuzzified centroid
-plot_fuzzy_result_with_center(raining_x_min, raining_x_max, raining_x_resolution, fuzzy_result, d_m, config)
+# Plot the fuzzy result rule with the defuzzified centroid
+# We only call this function for Mamdani and Tsukamoto defuzzification.
+plot_fuzzy_result_with_center(raining_x_min, raining_x_max, raining_x_resolution, fuzzy_result, {'Mamdani': d_m, 'Tsukamoto': d_t}, config)
 
 
 if __name__ == '__main__':

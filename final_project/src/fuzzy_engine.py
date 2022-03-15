@@ -12,13 +12,13 @@ from utils import *
 class FuzzyEngine:
     def __init__(self,
                  inp: List[FuzzyVariable],
-                 out: FuzzyVariable,
+                 out,
                  operator: FuzzyRuleOperatorType,
                  out_min: int,
                  out_max: int
                  ):
         self.inp: List[FuzzyVariable] = inp
-        self.out: FuzzyVariable = out
+        self.out = out
         self.operator: FuzzyRuleOperatorType = operator
         # Range of the output fuzzy variable.
         self.out_min = out_min
@@ -55,6 +55,19 @@ class FuzzyEngine:
         # pprint.pprint(fuzzy_matrix)
 
         return fuzzy_matrix, conditions, conclusions, fuzzy_result
+
+    def calculate_sugeno(self, inp: Dict[FuzzyVariable, float]) -> Tuple:
+        """
+        Main function for calculating a final fuzzy result.
+        (1) Fuzzify the variables based on input values.
+        (2) Evaluate fuzzy conditions based on assertions in conditions.
+        (3) Calculate linear function between input values and output values.
+        """
+        fuzzy_matrix: Dict[FuzzyVariable, Dict[Domain, float]] = self.fuzzify(inp)
+        conditions: List[float] = self.rule_evaluation(fuzzy_matrix)
+        fuzzy_result = self.linear_mapping(inp)
+
+        return fuzzy_matrix, conditions, fuzzy_result
 
     def fuzzify(self, inp: Dict[FuzzyVariable, float]) -> Dict[FuzzyVariable, Dict[Domain, float]]:
         """
@@ -170,3 +183,16 @@ class FuzzyEngine:
             return np.amax(np.array(conclusion), axis=0)
         else:
             pass
+
+    def linear_mapping(self, inp: Dict[FuzzyVariable, float]) -> List:
+
+        # Dimension check
+        assert len(self.out.sugenofunction) == len(inp), 'Wrong dimension'
+
+        z = []
+        for rule in self.rules:
+            function_name = rule[1].conclusion[1]
+            line_z = self.out.get_function_by_name(function_name).const + sum([self.out.get_function_by_name(function_name).coefficient.get(variable) * value for variable, value in inp.items()])
+            z.append(line_z)
+
+        return z

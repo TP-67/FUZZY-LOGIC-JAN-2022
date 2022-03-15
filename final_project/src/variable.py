@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from domain import Domain
 
 
@@ -20,3 +20,27 @@ class FuzzyVariable:
     @property
     def value(self):
         return self.domain
+
+
+class SugenoFuzzyFunction:
+
+    def __init__(self, name: str, coefficient: Dict[FuzzyVariable, float], const: float):
+        self.name: str = name
+        self.coefficient: Dict[FuzzyVariable, float] = coefficient
+        self.const = const
+
+
+class SugenoFuzzyVariable:
+
+    def __init__(self, name: str, *sugenofunction: SugenoFuzzyFunction):
+        self.name: str = name
+        self.sugenofunction: List[SugenoFuzzyFunction] = list(sugenofunction)
+
+    def get_function_by_name(self, name: str) -> SugenoFuzzyFunction or None:
+        for s in self.sugenofunction:
+            if s.name == name:
+                return s
+
+    @property
+    def value(self):
+        return self.sugenofunction
