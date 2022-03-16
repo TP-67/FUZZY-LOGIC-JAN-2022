@@ -1,2 +1,0 @@
-Anticipated health index (Mamdani): 16.86426485813266
-Anticipated health index (Tsukamoto):23.310813063501822

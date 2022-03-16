@@ -1,8 +1,0 @@
-Project:
-- Fuzzy Logic System
-
-Code Reference:
-- https://github.com/Luferov/FuzzyLogicToolBox
-- https://github.com/hamedmalek/pyfuzzy
-- https://github.com/amogorkon/fuzzylogic
-- https://github.com/pribalta/takagi_sugeno_kang_fuzzy_system
